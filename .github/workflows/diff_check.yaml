@@ -1,0 +1,31 @@
+name: Create Develop to pull request
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create-release-pr:
+    runs-on: ubuntu-latest
+    env:
+      TZ: 'Asia/Tokyo'
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Check for code changes
+      id: code-changes
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const { execSync } = require('child_process');
+          const output = execSync('git diff --name-only HEAD~1 HEAD').toString().trim();
+          return output ? { changes: true } : { changes: false };
+
+    - name: Stop if no code changes
+      if: steps.code-changes.outputs.changes == 'false'
+      run: echo "No code changes detected. Exiting..."
+    
+    - name: Continue if there are code changes
+      if: steps.code-changes.outputs.changes == 'true'
+      run: echo "Code changes detected. Continuing with the workflow..."
