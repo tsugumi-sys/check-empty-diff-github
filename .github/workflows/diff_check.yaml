@@ -15,17 +15,19 @@ jobs:
 
     - name: Check for code changes
       id: code-changes
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const { execSync } = require('child_process');
-          const output = execSync('git diff --name-only HEAD~1 HEAD').toString().trim();
-          return output ? { changes: true } : { changes: false };
+      run: |
+        git fetch origin
+        if git rev-parse HEAD~1 >/dev/null 2>&1; then
+          CHANGES=$(git diff HEAD~1 HEAD | wc -c)
+        else
+          CHANGES=0
+        fi
+        echo "CHANGES=$CHANGES" >> $GITHUB_ENV
 
     - name: Stop if no code changes
-      if: steps.code-changes.outputs.changes == 'false'
+      if: env.CHANGES == '0'
       run: echo "No code changes detected. Exiting..."
-    
+
     - name: Continue if there are code changes
-      if: steps.code-changes.outputs.changes == 'true'
+      if: env.CHANGES != '0'
       run: echo "Code changes detected. Continuing with the workflow..."
