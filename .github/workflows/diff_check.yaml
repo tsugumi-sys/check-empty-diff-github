@@ -13,6 +13,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Display Branch Name
+      run: echo "Current Branch ${{ github.ref }}"
+
     - name: Check for code changes
       id: code-changes
       run: |
