@@ -20,11 +20,7 @@ jobs:
       id: code-changes
       run: |
         git fetch origin
-        if git rev-parse HEAD~1 >/dev/null 2>&1; then
-          CHANGES=$(git diff HEAD~1 HEAD | wc -c)
-        else
-          CHANGES=0
-        fi
+        CHANGES=$(git diff HEAD~1 HEAD | wc -c)
         echo "CHANGES=$CHANGES" >> $GITHUB_ENV
 
     - name: Stop if no code changes
